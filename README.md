@@ -1,11 +1,3 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge" alt="Status">
-  <img src="https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel" alt="Vercel">
-  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/TensorFlow-2.x-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow">
-  <img src="https://img.shields.io/badge/scikit--learn-1.x-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="scikit-learn">
-</p>
-
 # Smart Home Energy Prediction
 
 > **Prediksi Konsumsi Energi Rumah Tangga Menggunakan Metode Random Forest, Gradient Boosting, dan LSTM pada Sistem Smart Home**
@@ -172,7 +164,7 @@ Proyek skripsi yang membandingkan tiga algoritma Machine Learning/Deep Learning 
 
 | Parameter | Nilai |
 |---|---|
-| Architecture | `LSTM(64)` → `Dropout(0.2)` → `LSTM(32)` → `Dense(16, ReLU)` → `Dense(1)` |
+| Architecture | `LSTM(64)` - `Dropout(0.2)` - `LSTM(32)` - `Dense(16, ReLU)` - `Dense(1)` |
 | Optimizer | Adam (`lr=0.001`) |
 | Loss | Mean Squared Error (MSE) |
 | Batch Size | 64 |
