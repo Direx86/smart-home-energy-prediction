@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Energy Prediction</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <span class="brand-icon">⚡</span>
+        <div>
+            <h2>Smart Home Energy</h2>
+            <p>Prediksi Konsumsi Energi Rumah Tangga</p>
+        </div>
+    </div>
+    <hr class="divider">
+    <nav class="nav-menu">
+        <a href="#" class="nav-link active" data-page="dashboard"><span>🏠</span> Dashboard</a>
+        <a href="#" class="nav-link" data-page="prediksi"><span>📊</span> Prediksi &amp; Perbandingan</a>
+        <a href="#" class="nav-link" data-page="model"><span>🧠</span> Informasi Model</a>
+    </nav>
+    <div class="sidebar-footer">
+        <hr class="divider">
+        <p class="footer-label">Dataset</p>
+        <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener" class="footer-link">📂 UCI Power Consumption</a>
+        <p class="footer-text">Desember 2006 – November 2010</p>
+        <hr class="divider">
+        <p class="footer-text">Skripsi — Franscen Yosafat Sinambela · 2025</p>
+        <p class="footer-text dim">RF · GB · LSTM Comparison</p>
+    </div>
+</aside>
+
+<!-- Mobile Header -->
+<header class="mobile-header" id="mobile-header">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button>
+    <h2>⚡ Smart Home Energy</h2>
+</header>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- Main Content -->
+<main class="content">
+
+<!-- ═══════════════════════════════════════ DASHBOARD ═══════════════════════════════════════ -->
+<section id="page-dashboard" class="page active">
+    <div class="page-header">
+        <h1>🏠 Dashboard Smart Home</h1>
+        <p class="subtitle">Monitoring &amp; Prediksi Konsumsi Energi Rumah Tangga</p>
+    </div>
+
+    <div class="stat-grid" id="stat-cards">
+        <div class="stat-card">
+            <p class="stat-label">⚡ Konsumsi Terakhir</p>
+            <p class="stat-value" id="stat-latest">—</p>
+            <p class="stat-help">Global Active Power (terbaru)</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">📈 Rata-rata 7 Hari</p>
+            <p class="stat-value" id="stat-avg">—</p>
+            <p class="stat-help" id="stat-avg-help">—</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">🔺 Konsumsi Tertinggi</p>
+            <p class="stat-value" id="stat-max">—</p>
+            <p class="stat-help">Puncak pemakaian 7 hari</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">🔻 Konsumsi Terendah</p>
+            <p class="stat-value" id="stat-min">—</p>
+            <p class="stat-help">Minimum pemakaian 7 hari</p>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>📋 Variabel Dataset UCI</h2>
+    <p class="section-caption">Sumber: <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Machine Learning Repository</a> — Individual Household Electric Power Consumption</p>
+
+    <div class="var-grid">
+        <div class="var-card">
+            <p class="var-name">⚡ Global Active Power</p>
+            <div class="var-badge" style="border-left-color:#3b82f6">Global_active_power <span class="unit">(kW)</span></div>
+            <p class="var-desc">Total daya aktif rumah tangga — <strong>TARGET prediksi</strong></p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">🔄 Global Reactive Power</p>
+            <div class="var-badge" style="border-left-color:#8b5cf6">Global_reactive_power <span class="unit">(kW)</span></div>
+            <p class="var-desc">Total daya reaktif rumah tangga</p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">⚡ Voltage</p>
+            <div class="var-badge" style="border-left-color:#eab308">Voltage <span class="unit">(Volt)</span></div>
+            <p class="var-desc">Tegangan listrik rata-rata per menit</p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">🔌 Global Intensity</p>
+            <div class="var-badge" style="border-left-color:#f97316">Global_intensity <span class="unit">(Ampere)</span></div>
+            <p class="var-desc">Arus listrik rata-rata per menit</p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">🍳 Sub Metering 1</p>
+            <div class="var-badge" style="border-left-color:#10b981">Sub_metering_1 <span class="unit">(Wh)</span></div>
+            <p class="var-desc">Dapur: dishwasher, oven, microwave</p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">👕 Sub Metering 2</p>
+            <div class="var-badge" style="border-left-color:#06b6d4">Sub_metering_2 <span class="unit">(Wh)</span></div>
+            <p class="var-desc">Laundry: mesin cuci, pengering, kulkas</p>
+        </div>
+        <div class="var-card">
+            <p class="var-name">🌡️ Sub Metering 3</p>
+            <div class="var-badge" style="border-left-color:#ef4444">Sub_metering_3 <span class="unit">(Wh)</span></div>
+            <p class="var-desc">Pemanas air listrik &amp; AC</p>
+        </div>
+    </div>
+
+    <div class="info-box">📊 <strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="dashboard-points">—</strong> points</div>
+
+    <hr class="section-divider">
+
+    <h2>📉 Grafik Perbandingan Prediksi 3 Model</h2>
+    <div id="dashboard-chart" class="chart-container"></div>
+
+    <hr class="section-divider">
+    <div id="dashboard-metrics"></div>
+</section>
+
+<!-- ═══════════════════════════════════════ PREDIKSI ═══════════════════════════════════════ -->
+<section id="page-prediksi" class="page">
+    <div class="page-header">
+        <h1>📊 Prediksi &amp; Perbandingan</h1>
+        <p class="subtitle">Bandingkan hasil prediksi RF, GB, dan LSTM pada <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">dataset UCI asli</a></p>
+    </div>
+
+    <div class="info-box">📊 <strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="prediksi-points">—</strong> points</div>
+
+    <hr class="section-divider">
+
+    <h2>⚙️ Kontrol Visualisasi</h2>
+    <div class="controls-grid">
+        <div class="control-card">
+            <p class="control-label">Rentang Waktu</p>
+            <div class="radio-group">
+                <label class="radio-btn"><input type="radio" name="timeRange" value="24"> 24 Jam</label>
+                <label class="radio-btn"><input type="radio" name="timeRange" value="48"> 48 Jam</label>
+                <label class="radio-btn"><input type="radio" name="timeRange" value="168" checked> 7 Hari</label>
+                <label class="radio-btn"><input type="radio" name="timeRange" value="720"> 30 Hari</label>
+                <label class="radio-btn"><input type="radio" name="timeRange" value="0"> Full Test Set</label>
+            </div>
+        </div>
+        <div class="control-card">
+            <p class="control-label">Tampilkan Model</p>
+            <div class="checkbox-group">
+                <label class="check-btn"><input type="checkbox" id="show-actual" checked> Aktual</label>
+                <label class="check-btn"><input type="checkbox" id="show-rf" checked> RF</label>
+                <label class="check-btn"><input type="checkbox" id="show-gb" checked> GB</label>
+                <label class="check-btn"><input type="checkbox" id="show-lstm" checked> LSTM</label>
+            </div>
+        </div>
+    </div>
+
+    <div id="prediksi-chart" class="chart-container"></div>
+
+    <details class="expander">
+        <summary>📊 Analisis Error — <span id="error-points">0</span> points</summary>
+        <div id="error-content" class="error-grid"></div>
+    </details>
+
+    <div id="dynamic-metrics"></div>
+    <div id="official-metrics" style="margin-top:24px"></div>
+
+    <hr class="section-divider">
+
+    <!-- Penjelasan Metrik -->
+    <h2>📖 Penjelasan Metrik Evaluasi</h2>
+    <div class="card">
+        <h3>Apa itu MAE, RMSE, dan R²?</h3>
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="tab-mae">MAE</button>
+                <button class="tab-btn" data-tab="tab-rmse">RMSE</button>
+                <button class="tab-btn" data-tab="tab-r2">R²</button>
+            </div>
+            <div class="tab-content active" id="tab-mae">
+                <h4>1. MAE — Mean Absolute Error (Rata-rata Kesalahan Absolut)</h4>
+                <p>MAE mengukur <strong>rata-rata selisih absolut</strong> antara nilai prediksi dan nilai aktual.</p>
+                <p><strong>Rumus:</strong> MAE = (1/n) × Σ|yᵢ − ŷᵢ|</p>
+                <p><strong>Interpretasi:</strong></p>
+                <ul>
+                    <li>MAE menunjukkan seberapa besar rata-rata kesalahan prediksi model <strong>dalam satuan asli (kW)</strong>.</li>
+                    <li>Semakin kecil MAE → semakin akurat model.</li>
+                    <li>Contoh: MAE = 0.0158 kW artinya rata-rata prediksi meleset hanya <strong>~15.8 Watt</strong> dari nilai sebenarnya.</li>
+                </ul>
+                <p><strong>Kelebihan MAE:</strong></p>
+                <ul>
+                    <li>Mudah diinterpretasikan — satuannya sama dengan data asli.</li>
+                    <li>Tidak terlalu sensitif terhadap outlier (pencilan data).</li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tab-rmse">
+                <h4>2. RMSE — Root Mean Squared Error (Akar Rata-rata Kesalahan Kuadrat)</h4>
+                <p>RMSE mengukur <strong>akar dari rata-rata kuadrat selisih</strong> antara prediksi dan nilai aktual.</p>
+                <p><strong>Rumus:</strong> RMSE = √[(1/n) × Σ(yᵢ − ŷᵢ)²]</p>
+                <p><strong>Interpretasi:</strong></p>
+                <ul>
+                    <li>RMSE juga dalam satuan kW, namun memberikan <strong>penalti lebih besar untuk kesalahan yang besar</strong>.</li>
+                    <li>Jika RMSE ≫ MAE → ada beberapa prediksi yang meleset jauh (outlier error).</li>
+                    <li>Jika RMSE ≈ MAE → prediksi konsisten tanpa kesalahan ekstrem.</li>
+                </ul>
+                <p><strong>Perbandingan MAE vs RMSE:</strong><br>Pada RF dan GB, RMSE ≈ MAE → model sangat konsisten, nyaris tidak ada kesalahan besar.</p>
+            </div>
+            <div class="tab-content" id="tab-r2">
+                <h4>3. R² — R-Squared (Koefisien Determinasi)</h4>
+                <p>R² mengukur <strong>proporsi variabilitas data yang dapat dijelaskan oleh model</strong>.</p>
+                <p><strong>Rumus:</strong> R² = 1 − (SS_res / SS_tot)</p>
+                <ul>
+                    <li>SS_res = Σ(yᵢ − ŷᵢ)² (total kesalahan model)</li>
+                    <li>SS_tot = Σ(yᵢ − ȳ)² (total variasi data)</li>
+                </ul>
+                <p><strong>Interpretasi nilai R²:</strong></p>
+                <table class="simple-table">
+                    <thead><tr><th>Nilai R²</th><th>Arti</th></tr></thead>
+                    <tbody>
+                        <tr><td>1.0000</td><td>Model sempurna — prediksi 100% cocok</td></tr>
+                        <tr><td>0.9989</td><td>Model menjelaskan 99.89% variasi data — sangat akurat</td></tr>
+                        <tr><td>0.5243</td><td>Model menjelaskan 52.43% variasi — cukup</td></tr>
+                        <tr><td>0.0</td><td>Tidak lebih baik dari prediksi rata-rata</td></tr>
+                        <tr><td>&lt; 0</td><td>Lebih buruk dari prediksi rata-rata</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Kelebihan R²:</strong></p>
+                <ul>
+                    <li>Memberikan gambaran menyeluruh tentang kualitas model.</li>
+                    <li>Tidak bergantung pada skala/satuan data.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>🔍 Interpretasi Hasil</h2>
+    <div id="interpretation-cards"></div>
+
+    <hr class="section-divider">
+    <div id="conclusion-section"></div>
+
+    <p class="section-caption" style="margin-top:16px">Semua data berasal dari <strong><a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">dataset UCI asli</a></strong> (household_power_consumption.txt). Periode test set: April – November 2010.</p>
+</section>
+
+<!-- ═══════════════════════════════════════ INFORMASI MODEL ═══════════════════════════════════════ -->
+<section id="page-model" class="page">
+    <div class="page-header">
+        <h1>🧠 Informasi Model</h1>
+        <p class="subtitle">Detail arsitektur, parameter, dan karakteristik masing-masing model prediksi</p>
+    </div>
+
+    <!-- Random Forest -->
+    <details class="expander" open>
+        <summary>🌲 Random Forest — Ensemble (Bagging)</summary>
+        <div class="expander-body">
+            <p>Ensemble dari banyak Decision Tree yang dilatih secara <strong>paralel</strong> dengan teknik bagging. Setiap tree dilatih pada subset data acak, lalu hasil prediksi dirata-ratakan. Robust terhadap overfitting dan mampu menangkap hubungan non-linear.</p>
+            <hr class="divider">
+            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <table class="simple-table">
+                <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
+                <tbody>
+                    <tr><td>n_estimators</td><td>80–200 (tuned via RandomizedSearchCV)</td></tr>
+                    <tr><td>max_depth</td><td>8, 12, atau None (tuned)</td></tr>
+                    <tr><td>random_state</td><td>42</td></tr>
+                    <tr><td>n_jobs</td><td>-1 (paralel)</td></tr>
+                </tbody>
+            </table>
+            <div class="pros-cons">
+                <div>
+                    <h4>✅ Kelebihan</h4>
+                    <ul>
+                        <li>Robust terhadap overfitting</li>
+                        <li>Tidak perlu scaling data</li>
+                        <li>Dapat menghitung feature importance</li>
+                        <li>Performa sangat baik (R² &gt; 0.998)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>❌ Kekurangan</h4>
+                    <ul>
+                        <li>Model berukuran besar (~48 MB)</li>
+                        <li>Tidak menangkap pola sekuensial secara native</li>
+                        <li>Membutuhkan feature engineering manual</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <!-- Gradient Boosting -->
+    <details class="expander">
+        <summary>📈 Gradient Boosting — Ensemble (Boosting)</summary>
+        <div class="expander-body">
+            <p>Ensemble dari Decision Tree yang dilatih secara <strong>sekuensial</strong>. Setiap tree baru belajar dari kesalahan (residual) tree sebelumnya, sehingga model terus membaik. Dikenal sebagai salah satu metode terbaik untuk data tabular.</p>
+            <hr class="divider">
+            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <table class="simple-table">
+                <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
+                <tbody>
+                    <tr><td>n_estimators</td><td>120–360 (tuned via RandomizedSearchCV)</td></tr>
+                    <tr><td>learning_rate</td><td>0.05–0.20 (tuned)</td></tr>
+                    <tr><td>max_depth</td><td>3</td></tr>
+                    <tr><td>random_state</td><td>42</td></tr>
+                </tbody>
+            </table>
+            <div class="pros-cons">
+                <div>
+                    <h4>✅ Kelebihan</h4>
+                    <ul>
+                        <li>Performa terbaik (R² = 0.9989)</li>
+                        <li>Model ringan (~330 KB)</li>
+                        <li>Generalisasi baik dengan learning rate rendah</li>
+                        <li>Feature importance yang interpretable</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>❌ Kekurangan</h4>
+                    <ul>
+                        <li>Training lebih lambat dari Random Forest</li>
+                        <li>Sensitif terhadap hyperparameter</li>
+                        <li>Sequential training (tidak bisa paralel antar tree)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <!-- LSTM -->
+    <details class="expander">
+        <summary>🧠 LSTM — Deep Learning (RNN)</summary>
+        <div class="expander-body">
+            <p>Long Short-Term Memory — arsitektur Recurrent Neural Network yang mampu mempelajari <strong>dependensi jangka panjang</strong> dalam data sekuensial. Menggunakan mekanisme gate (forget, input, output) untuk mengontrol aliran informasi.</p>
+            <hr class="divider">
+            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <table class="simple-table">
+                <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
+                <tbody>
+                    <tr><td>architecture</td><td>LSTM(64) → Dropout(0.2) → LSTM(32) → Dense(16, ReLU) → Dense(1)</td></tr>
+                    <tr><td>optimizer</td><td>Adam (learning rate = 0.001)</td></tr>
+                    <tr><td>loss_function</td><td>Mean Squared Error (MSE)</td></tr>
+                    <tr><td>window_size</td><td>24 jam</td></tr>
+                    <tr><td>batch_size</td><td>64</td></tr>
+                    <tr><td>epochs</td><td>50 (Early Stopping, patience=10)</td></tr>
+                </tbody>
+            </table>
+            <div class="pros-cons">
+                <div>
+                    <h4>✅ Kelebihan</h4>
+                    <ul>
+                        <li>Dapat mempelajari pola temporal secara otomatis</li>
+                        <li>Tidak perlu feature engineering manual</li>
+                        <li>Skalabel untuk data streaming/real-time</li>
+                        <li>Model sangat ringan (~400 KB)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>❌ Kekurangan</h4>
+                    <ul>
+                        <li>Performa lebih rendah (R² = 0.52) hanya dengan 1 fitur</li>
+                        <li>Butuh GPU untuk training cepat</li>
+                        <li>Memerlukan normalisasi data (StandardScaler)</li>
+                        <li>Hyperparameter tuning lebih kompleks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+    <hr class="section-divider">
+
+    <h2>🛠️ Rekayasa Fitur (Feature Engineering)</h2>
+    <p><strong>Fitur untuk Random Forest &amp; Gradient Boosting (24 fitur total):</strong></p>
+    <div class="feature-grid">
+        <div class="card">
+            <h4>Fitur Sensor (6)</h4>
+            <div class="feature-tags">
+                <span class="feature-tag">Global_reactive_power</span>
+                <span class="feature-tag">Voltage</span>
+                <span class="feature-tag">Global_intensity</span>
+                <span class="feature-tag">Sub_metering_1</span>
+                <span class="feature-tag">Sub_metering_2</span>
+                <span class="feature-tag">Sub_metering_3</span>
+            </div>
+        </div>
+        <div class="card">
+            <h4>Fitur Kalender (4)</h4>
+            <div class="feature-tags">
+                <span class="feature-tag">hour</span>
+                <span class="feature-tag">dayofweek</span>
+                <span class="feature-tag">is_weekend</span>
+                <span class="feature-tag">month</span>
+            </div>
+        </div>
+        <div class="card">
+            <h4>Fitur Lag (6)</h4>
+            <div class="feature-tags">
+                <span class="feature-tag">lag1</span>
+                <span class="feature-tag">lag2</span>
+                <span class="feature-tag">lag3</span>
+                <span class="feature-tag">lag6</span>
+                <span class="feature-tag">lag12</span>
+                <span class="feature-tag">lag24</span>
+            </div>
+        </div>
+        <div class="card">
+            <h4>Fitur Rolling (8)</h4>
+            <div class="feature-tags">
+                <span class="feature-tag">rollmean3</span>
+                <span class="feature-tag">rollmean6</span>
+                <span class="feature-tag">rollmean12</span>
+                <span class="feature-tag">rollmean24</span>
+                <span class="feature-tag">rollstd3</span>
+                <span class="feature-tag">rollstd6</span>
+                <span class="feature-tag">rollstd12</span>
+                <span class="feature-tag">rollstd24</span>
+            </div>
+        </div>
+    </div>
+
+    <p><strong>Input untuk LSTM:</strong></p>
+    <div class="lstm-info">
+        <strong>Window:</strong> <span class="val">24 jam</span> ·
+        <strong>Fitur:</strong> <span class="val">Global_active_power</span> ·
+        <strong>Normalisasi:</strong> <span class="val">StandardScaler</span><br>
+        <strong>Shape:</strong> <span class="val">(1, 24, 1)</span> ·
+        <strong>Mean:</strong> <span class="val">1.086397</span> ·
+        <strong>Std:</strong> <span class="val">0.929282</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <h2>📂 Tentang Dataset</h2>
+    <p><strong>Sumber:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Machine Learning Repository — Individual Household Electric Power Consumption</a></p>
+    <table class="simple-table" style="margin-top:12px">
+        <thead><tr><th>Detail</th><th>Keterangan</th></tr></thead>
+        <tbody>
+            <tr><td>Periode</td><td>Desember 2006 – November 2010 (~4 tahun)</td></tr>
+            <tr><td>Resolusi Asli</td><td>Per menit (2.075.259 records)</td></tr>
+            <tr><td>Resolusi Digunakan</td><td>Per jam / 1H (resampled mean) → 34.168 records</td></tr>
+            <tr><td>Target</td><td>Global_active_power (kW)</td></tr>
+            <tr><td>Split Data</td><td>Train 70% (23.902) | Validation 15% (5.121) | Test 15% (5.121)</td></tr>
+            <tr><td>Metode Split</td><td>Time-based split (kronologis, tanpa shuffling)</td></tr>
+        </tbody>
+    </table>
+    <p style="margin-top:16px">📎 <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">Unduh dataset dari UCI Repository</a></p>
+</section>
+
+</main>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
+
+# Environment
+.env
+node_modules/
+
+# Python (jika ada)
+__pycache__/
+*.pyc
+venv/
+
+# Large files (jangan commit)
+*.joblib
+*.keras
+*.h5
+*.zip
+*.txt
