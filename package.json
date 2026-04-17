@@ -1,0 +1,11 @@
+{
+  "name": "smart-home-energy-prediction",
+  "version": "1.0.0",
+  "description": "Smart Home Energy Prediction — thesis project comparing RF, GB, and LSTM models",
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "unzipper": "^0.12.3"
+  }
+}

@@ -67,7 +67,7 @@ li { margin-bottom: 4px; }
     gap: 12px;
     padding-bottom: 4px;
 }
-.brand-icon { font-size: 28px; }
+.brand-icon { width: 28px; height: 28px; flex-shrink: 0; color: var(--accent-cyan); }
 .sidebar-brand h2 { font-size: 16px; font-weight: 700; }
 .sidebar-brand p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
@@ -80,7 +80,6 @@ li { margin-bottom: 4px; }
 }
 .nav-link:hover { background: rgba(255,255,255,.05); color: var(--text-primary); text-decoration: none; }
 .nav-link.active { background: rgba(56,189,248,.1); color: var(--accent-cyan); }
-.nav-link span { font-size: 16px; width: 22px; text-align: center; }
 
 .sidebar-footer { margin-top: auto; }
 .footer-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 6px; }
@@ -99,8 +98,10 @@ li { margin-bottom: 4px; }
 .mobile-header h2 { font-size: 16px; }
 .menu-toggle {
     background: none; border: 1px solid var(--border); color: var(--text-primary);
-    font-size: 20px; padding: 4px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
 }
+.menu-toggle svg { width: 20px; height: 20px; }
 .sidebar-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,.5); z-index: 99;

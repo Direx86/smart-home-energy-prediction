@@ -5,18 +5,29 @@ Thumbs.db
 # Vercel
 .vercel/
 
+# Claude Code (worktrees & local config)
+.claude/
+
 # Environment
 .env
 node_modules/
 
-# Python (jika ada)
+# Python
 __pycache__/
 *.pyc
 venv/
 
-# Large files (jangan commit)
+# Large ML model files (jangan commit)
 *.joblib
 *.keras
 *.h5
-*.zip
+
+# Dataset extracted (125 MB — di-generate saat build)
 *.txt
+
+# Data JSON generated at build time (di-generate dari zip + predictions.json)
+data/full_test_data.json
+data/sample_data.json
+
+# Dataset zip BOLEH di-commit (ukuran < 100 MB setelah dikompresi)
+# !data/*.zip  ← tidak perlu karena *.zip tidak lagi di-exclude

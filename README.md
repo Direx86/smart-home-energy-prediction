@@ -4,253 +4,269 @@
 
 Proyek skripsi yang membandingkan tiga algoritma Machine Learning/Deep Learning untuk memprediksi konsumsi daya aktif rumah tangga (`Global_active_power`) menggunakan dataset [UCI - Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption). Hasil evaluasi divisualisasikan dalam website interaktif yang di-deploy ke **Vercel**.
 
+> **Institusi:** STMIK TIME Medan — Program Studi Teknik Informatika  
+> **Penulis:** Franscen Yosafat Sinambela (NIM. 2244053) — 2025
+
+---
+
+## Hasil Evaluasi Model
+
+| Ranking | Model | MAE (kW) | RMSE (kW) | R² |
+|:-------:|-------|----------:|----------:|---:|
+| 1 | **Gradient Boosting** | **0.015776** | **0.023924** | **0.998864** |
+| 2 | Random Forest | 0.016618 | 0.024882 | 0.998771 |
+| 3 | LSTM (baseline) | 0.346233 | 0.489603 | 0.524311 |
+
+> Evaluasi pada **5.121 titik** data test set (April – November 2010, 15% dari total data).
+
+---
+
+## Stack Teknologi (Versi Terkunci)
+
+### Training Model (Python / Google Colab)
+
+| Paket | Versi | Kegunaan |
+|-------|-------|----------|
+| Python | 3.10.12 | Runtime utama |
+| numpy | 1.26.4 | Operasi array |
+| pandas | 2.2.2 | Manipulasi data |
+| scikit-learn | 1.3.2 | Random Forest, Gradient Boosting, preprocessing |
+| tensorflow | 2.13.1 | LSTM (Keras API) |
+| keras | 2.13.1 | High-level neural network API |
+| matplotlib | 3.8.4 | Visualisasi training |
+| joblib | 1.3.2 | Serialisasi model |
+
+### Build Pipeline (Node.js)
+
+| Paket | Versi | Kegunaan |
+|-------|-------|----------|
+| Node.js | 18.x LTS | Runtime build script |
+| unzipper | 0.12.3 | Ekstrak dataset zip saat Vercel build |
+
+### Frontend (Static)
+
+| Library | Versi | Kegunaan |
+|---------|-------|----------|
+| Plotly.js | 2.35.2 | Grafik interaktif (CDN) |
+| HTML5 / CSS3 / Vanilla JS | — | SPA tanpa framework |
+
+### Deployment
+
+| Platform | Keterangan |
+|----------|------------|
+| Vercel | Static hosting + custom build command |
+| GitHub | Version control + trigger Vercel CI/CD |
+
 ---
 
 ## Arsitektur Sistem
 
 ```
-+=====================================================================+
-|                        PIPELINE PENELITIAN                          |
-+=====================================================================+
-|                                                                     |
-|  +-------------------+     +--------------------+                   |
-|  | Dataset UCI (Raw) |---->| Pra-pemrosesan     |                   |
-|  | 2.075.259 baris   |     | - Missing values   |                   |
-|  | per menit         |     | - Resampling 1 jam |                   |
-|  +-------------------+     | - 34.168 baris     |                   |
-|                            +--------+-----------+                   |
-|                                     |                               |
-|                    +----------------+----------------+              |
-|                    |                |                |               |
-|             +------v------+  +------v------+  +-----v-------+      |
-|             | Feature Eng |  | Feature Eng |  | StandardScaler|     |
-|             | 24 fitur    |  | 24 fitur    |  | Window = 24h  |     |
-|             +------+------+  +------+------+  +------+------+      |
-|                    |                |                |               |
-|             +------v------+  +------v------+  +-----v-------+      |
-|             | Random      |  | Gradient    |  |    LSTM      |     |
-|             | Forest      |  | Boosting    |  | (64-32-16-1) |     |
-|             | n_est=300   |  | n_est=500   |  | epochs=100   |     |
-|             +------+------+  +------+------+  +------+------+      |
-|                    |                |                |               |
-|                    +----------------+----------------+              |
-|                                     |                               |
-|                            +--------v---------+                     |
-|                            | Evaluasi Model   |                     |
-|                            | MAE, RMSE, R2    |                     |
-|                            +--------+---------+                     |
-|                                     |                               |
-|  +----------------------------------v----------------------------+  |
-|  |              WEBSITE INTERAKTIF (Vercel)                      |  |
-|  |  +------------+  +-------------------+  +------------------+  |  |
-|  |  | Dashboard  |  | Prediksi &        |  | Informasi Model  |  |  |
-|  |  | Statistik  |  | Perbandingan      |  | Arsitektur &     |  |  |
-|  |  | & Grafik   |  | Grafik Interaktif |  | Parameter        |  |  |
-|  |  +------------+  +-------------------+  +------------------+  |  |
-|  +---------------------------------------------------------------+  |
-+=====================================================================+
+GITHUB REPOSITORY
+├── data/
+│   ├── individual+household+electric+power+consumption.zip   <- dataset (< 100 MB, di-commit)
+│   └── predictions.json                                       <- prediksi RF/GB/LSTM per jam (~364 KB)
+├── scripts/
+│   ├── build.js               <- build script (dijalankan Vercel saat deploy)
+│   └── extract-predictions.js <- utility lokal sekali pakai
+├── index.html / css/ / js/    <- frontend statis
+├── package.json               <- dependency: unzipper@0.12.3
+└── vercel.json                <- buildCommand + Cache-Control headers
 ```
 
 ```
-+-----------------------------------------+
-|       ARSITEKTUR WEBSITE (Vercel)       |
-+-----------------------------------------+
-|                                         |
-|   Browser                               |
-|   +-----------------------------------+ |
-|   |          index.html (SPA)         | |
-|   |   +----------+  +-------------+  | |
-|   |   | style.css|  | Plotly.js   |  | |
-|   |   | Dark UI  |  | CDN Charts |  | |
-|   |   +----------+  +-------------+  | |
-|   |          |                        | |
-|   |   +------v--------+              | |
-|   |   |   app.js      |              | |
-|   |   |   Navigation  |              | |
-|   |   |   Rendering   |              | |
-|   |   |   Metrics Calc|              | |
-|   |   +------+--------+              | |
-|   |          |                        | |
-|   +----------|------------------------+ |
-|              | fetch()                  |
-|   +----------v-----------+              |
-|   |   data/ (Static JSON)|              |
-|   |   sample_data.json   |  168 pts    |
-|   |   full_test_data.json|  5.121 pts  |
-|   +-----------------------+              |
-+-----------------------------------------+
+VERCEL DEPLOY PIPELINE
+          git push
+             |
+             v
+    [npm install]
+    pasang unzipper@0.12.3
+             |
+             v
+    [node scripts/build.js]
+             |
+    +--------+--------+
+    |                 |
+    v                 v
+Ekstrak zip      Load predictions.json
+    |            (5.121 prediksi RF/GB/LSTM)
+    v
+household_power_consumption.txt
+(125 MB, tidak di-commit ke git)
+    |
+    v
+Parse 2.075.259 baris
+format: dd/mm/yyyy;hh:mm:ss;Global_active_power;...
+    |
+    v
+Resample -> rata-rata per jam
+(test set: April 2010 - November 2010)
+    |
+    v
+Merge aktual + prediksi
+    |
+    +--------> data/full_test_data.json   (5.121 titik, ~580 KB)
+    +--------> data/sample_data.json      (168 titik = 7 hari, ~27 KB)
+             |
+             v
+    [deploy static files]
+             |
+             v
+    Vercel CDN (site live)
+```
+
+```
+FRONTEND - STATIC SPA (BROWSER)
+             |
+    fetch('data/sample_data.json')      <- 168 titik, 7 hari terakhir test set
+    fetch('data/full_test_data.json')   <- 5.121 titik, full test set
+             |
+             v
+    index.html  (Single Page Application, 3 halaman)
+    +---------------------+----------------------+-------------------+
+    |     Dashboard        |  Prediksi &          |  Informasi Model  |
+    |  - stat cards        |  Perbandingan        |  - RF/GB/LSTM     |
+    |  - variabel dataset  |  - grafik interaktif |    arsitektur     |
+    |  - chart 7 hari      |  - filter 24h/7d/30d |  - hyperparameter |
+    |  - metrik resmi      |  - error analysis    |  - feature eng.   |
+    +---------------------+  - metrik dinamis    |  - dataset info   |
+                           |  - interpretasi      +-------------------+
+                           +----------------------+
+             |
+             v
+    js/app.js (Vanilla JavaScript)
+    loadData() - createChart() - computeMetrics()
+    renderPrediksi() - renderErrorAnalysis() - renderDashboard()
+             |
+             v
+    Plotly.js v2.35.2 (CDN) -- dark theme interactive charts
+```
+
+```
+ALUR PELATIHAN MODEL (PYTHON / GOOGLE COLAB)
+
+household_power_consumption.txt (125 MB, 2.07 juta baris)
+             |
+             v
+    Preprocessing
+    - hapus missing values ('?')
+    - resample 1 menit -> 1 jam (mean)
+    - normalisasi Min-Max (RF/GB) / StandardScaler (LSTM)
+             |
+             v
+    Feature Engineering (24 fitur untuk RF & GB)
+    - Sensor    (6): Global_reactive_power, Voltage, Global_intensity, Sub_metering_1/2/3
+    - Kalender  (4): hour, dayofweek, is_weekend, month
+    - Lag       (6): lag1, lag2, lag3, lag6, lag12, lag24
+    - Rolling   (8): rollmean3/6/12/24, rollstd3/6/12/24
+             |
+             v
+    Train/Val/Test Split -- time-based (70% / 15% / 15%)
+    - Train : Des 2006 - Apr 2010  (23.902 jam)
+    - Val   : Apr 2010 - Ags 2010  ( 5.121 jam)
+    - Test  : Ags 2010 - Nov 2010  ( 5.121 jam)
+             |
+    +--------+--------+
+    |        |        |
+    v        v        v
+   RF       GB      LSTM
+(sklearn) (sklearn)(Keras)
+RandomizedSearchCV  Early Stopping
+100 iter, 5-fold    patience=10
+    |        |        |
+    v        v        v
+ .joblib  .joblib  .keras
+(~48 MB) (~330 KB)(~400 KB)
+[tidak di-commit ke git -- terlalu besar]
+             |
+             v
+    Prediksi pada test set (5.121 jam)
+             |
+             v
+    Export -> data/predictions.json   <- disimpan di repo (~364 KB)
 ```
 
 ---
 
 ## Dataset
 
-**Sumber:** [UCI Machine Learning Repository - Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
+**UCI Household Power Consumption**  
+Sumber: [archive.ics.uci.edu](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
 
-| Detail | Keterangan |
-|---|---|
-| Lokasi | Sceaux, Prancis |
-| Periode | Desember 2006 - November 2010 (~4 tahun) |
-| Resolusi Asli | Per menit (2.075.259 records) |
-| Resampling | Rata-rata per jam (`resample('1H').mean()`) |
-| Total Resampled | 34.168 records |
-| Missing Values | Ditangani dengan `na_values=['?']` |
-| Split | Train 70% (23.902) / Val 15% (5.121) / Test 15% (5.121) |
-| Metode Split | Time-based (kronologis, tanpa shuffling) |
+| Atribut | Keterangan |
+|---------|------------|
+| Periode pengukuran | Desember 2006 – November 2010 |
+| Interval asli | 1 menit |
+| Total baris | 2.075.259 |
+| Ukuran file .txt | ~125 MB (tidak di-commit, ada di dalam zip) |
+| Kolom target | `Global_active_power` (kW) |
+| Kolom fitur | `Global_reactive_power`, `Voltage`, `Global_intensity`, `Sub_metering_1`, `Sub_metering_2`, `Sub_metering_3` |
+| Missing values | Ditandai dengan `?`, dihapus saat preprocessing |
 
-### Variabel Dataset
-
-| No | Variabel | Satuan | Deskripsi |
-|:---:|---|---|---|
-| 1 | `Global_active_power` | kW | Total daya aktif rumah tangga **(TARGET)** |
-| 2 | `Global_reactive_power` | kW | Total daya reaktif rumah tangga |
-| 3 | `Voltage` | Volt | Tegangan listrik rata-rata |
-| 4 | `Global_intensity` | Ampere | Arus listrik rata-rata |
-| 5 | `Sub_metering_1` | Wh | Dapur: dishwasher, oven, microwave |
-| 6 | `Sub_metering_2` | Wh | Laundry: mesin cuci, pengering, kulkas |
-| 7 | `Sub_metering_3` | Wh | Pemanas air listrik & AC |
-
----
-
-## Feature Engineering
-
-### Random Forest & Gradient Boosting (24 fitur)
-
-| Kategori | Fitur | Jumlah |
-|---|---|:---:|
-| **Sensor** | `Global_reactive_power`, `Voltage`, `Global_intensity`, `Sub_metering_1`, `Sub_metering_2`, `Sub_metering_3` | 6 |
-| **Kalender** | `hour`, `dayofweek`, `is_weekend`, `month` | 4 |
-| **Lag** | `lag_1`, `lag_2`, `lag_3`, `lag_6`, `lag_12`, `lag_24` | 6 |
-| **Rolling Mean** | `rollmean_3`, `rollmean_6`, `rollmean_12`, `rollmean_24` | 4 |
-| **Rolling Std** | `rollstd_3`, `rollstd_6`, `rollstd_12`, `rollstd_24` | 4 |
-
-### LSTM (univariate)
-
-| Parameter | Nilai |
-|---|---|
-| Input | `Global_active_power` (1 fitur) |
-| Window Size | 24 jam |
-| Normalisasi | `StandardScaler` (fit pada training set) |
-| Input Shape | `(batch, 24, 1)` |
-
----
-
-## Konfigurasi Model
-
-### Random Forest Regressor
-
-| Parameter | Default | Tuned (RandomizedSearchCV) |
-|---|---|---|
-| `n_estimators` | 300 | 80-200 |
-| `max_depth` | None | 8, 12, None |
-| `min_samples_split` | 2 | 2-6 |
-| `min_samples_leaf` | 1 | 1-4 |
-| `max_features` | - | sqrt, None |
-| `random_state` | 42 | 42 |
-| `n_jobs` | -1 | -1 |
-
-### Gradient Boosting Regressor
-
-| Parameter | Default | Tuned (RandomizedSearchCV) |
-|---|---|---|
-| `n_estimators` | 500 | 120-360 |
-| `learning_rate` | 0.03 | 0.05-0.20 |
-| `max_depth` | 3 | 2-6 |
-| `subsample` | - | 0.8-1.0 |
-| `min_samples_split` | 2 | 2-6 |
-| `random_state` | 42 | 42 |
-
-### LSTM Network
-
-| Parameter | Nilai |
-|---|---|
-| Architecture | `LSTM(64)` - `Dropout(0.2)` - `LSTM(32)` - `Dense(16, ReLU)` - `Dense(1)` |
-| Optimizer | Adam (`lr=0.001`) |
-| Loss | Mean Squared Error (MSE) |
-| Batch Size | 64 |
-| Epochs | 100 (EarlyStopping `patience=10`) |
-| Window | 24 jam |
-
----
-
-## Hasil Evaluasi
-
-### Default Models (Test Set - 5.121 data points)
-
-| Model | MAE (kW) | RMSE (kW) | R² |
-|---|:---:|:---:|:---:|
-| Random Forest | 0.0134 | 0.0221 | 0.9990 |
-| **Gradient Boosting** | **0.0126** | **0.0206** | **0.9992** |
-| LSTM | 0.3411 | 0.4863 | 0.5307 |
-
-### Tuned Models (Test Set - 5.121 data points)
-
-| Model | MAE (kW) | RMSE (kW) | R² |
-|---|:---:|:---:|:---:|
-| RF Tuned | 0.0166 | 0.0248 | 0.9988 |
-| **GB Tuned** | **0.0147** | **0.0226** | **0.9990** |
-
-### Kesimpulan
+**Pembagian data setelah resampling hourly:**
 
 ```
-+-------------------------------------------------------+
-|                  RANKING MODEL                         |
-+-------------------------------------------------------+
-|  #1  Gradient Boosting  |  R² = 0.9992  |  MAE terkecil, RMSE terkecil
-|  #2  Random Forest      |  R² = 0.9990  |  Sangat dekat dengan GB
-|  #3  LSTM               |  R² = 0.5307  |  Hanya 1 fitur (univariate)
-+-------------------------------------------------------+
+2.075.259 baris (1 menit)
+          |
+          v resample hourly mean
+      34.144 jam total
+          |
+     +----+----+
+     |    |    |
+   70%   15%  15%
+ Train   Val  Test
+23.902  5.121 5.121 jam
 ```
 
-- **Gradient Boosting** unggul di **semua metrik** (MAE, RMSE, R²) dengan ukuran model paling kecil (~330 KB vs RF ~48 MB)
-- **Random Forest** sangat dekat performanya, namun model jauh lebih besar
-- **LSTM** hanya menggunakan 1 fitur (`Global_active_power`) vs 24 fitur pada tree models, sehingga performanya lebih rendah. LSTM berfungsi sebagai **baseline univariate** untuk menunjukkan pentingnya feature engineering
-- Metode **boosting** (sequential learning) secara iteratif mengoreksi kesalahan tree sebelumnya, menghasilkan akurasi lebih tinggi dibanding **bagging** (Random Forest)
-
 ---
 
-## Tech Stack
+## Model Machine Learning
 
-### Training & Eksperimen (Google Colab)
+### Feature Engineering (RF & GB — 24 fitur)
 
-| Komponen | Teknologi | Versi |
-|---|---|---|
-| Bahasa | Python | 3.12 |
-| ML Framework | scikit-learn | 1.x |
-| DL Framework | TensorFlow / Keras | 2.x |
-| Data Processing | Pandas, NumPy | - |
-| Visualisasi | Matplotlib, Seaborn | - |
-| Hyperparameter Tuning | RandomizedSearchCV | scikit-learn |
-| Serialisasi Model | joblib, Keras `.keras` | - |
+| Kelompok | Jumlah | Fitur |
+|----------|:------:|-------|
+| Sensor | 6 | `Global_reactive_power`, `Voltage`, `Global_intensity`, `Sub_metering_1`, `Sub_metering_2`, `Sub_metering_3` |
+| Kalender | 4 | `hour`, `dayofweek`, `is_weekend`, `month` |
+| Lag | 6 | `lag1`, `lag2`, `lag3`, `lag6`, `lag12`, `lag24` |
+| Rolling | 8 | `rollmean3`, `rollmean6`, `rollmean12`, `rollmean24`, `rollstd3`, `rollstd6`, `rollstd12`, `rollstd24` |
 
-### Website (Production)
+### Random Forest
 
-| Komponen | Teknologi |
-|---|---|
-| Frontend | HTML5, CSS3, JavaScript (Vanilla) |
-| Charts | [Plotly.js](https://plotly.com/javascript/) 2.35 |
-| UI Theme | Custom Dark Theme (CSS Variables) |
-| Deployment | [Vercel](https://vercel.com) (Static Site) |
-| Data Format | JSON (pre-computed predictions) |
+| Parameter | Nilai |
+|-----------|-------|
+| estimator | `RandomForestRegressor` (scikit-learn 1.3.2) |
+| n_estimators | 80–200 (RandomizedSearchCV, 100 iter, 5-fold CV) |
+| max_depth | 8, 12, atau None |
+| min_samples_split | 2–5 |
+| random_state | 42 |
+| n_jobs | -1 |
+| Ukuran model | ~48 MB (.joblib) |
 
-### Development Tools
+### Gradient Boosting (Model Terbaik)
 
-| Tool | Kegunaan |
-|---|---|
-| Google Colab | Training model & eksperimen |
-| VS Code | Pengembangan website |
-| Git + GitHub | Version control |
-| Vercel CLI | Deployment |
+| Parameter | Nilai |
+|-----------|-------|
+| estimator | `GradientBoostingRegressor` (scikit-learn 1.3.2) |
+| n_estimators | 120–360 (RandomizedSearchCV, 100 iter, 5-fold CV) |
+| learning_rate | 0.05–0.20 |
+| max_depth | 3 |
+| random_state | 42 |
+| Ukuran model | ~330 KB (.joblib) |
 
----
+### LSTM (Baseline Univariate)
 
-## Fitur Website
-
-| Halaman | Fitur |
-|---|---|
-| **Dashboard** | Kartu statistik (konsumsi terakhir, rata-rata, min/max), penjelasan variabel dataset, grafik perbandingan 3 model, tabel metrik evaluasi |
-| **Prediksi & Perbandingan** | Filter rentang waktu (24h/48h/7d/30d/full), toggle model (Aktual/RF/GB/LSTM), grafik interaktif Plotly, metrik dinamis & resmi, analisis error, interpretasi hasil, kesimpulan |
-| **Informasi Model** | Arsitektur detail tiap model, hyperparameter, kelebihan/kekurangan, feature engineering (24 fitur tree + 1 fitur LSTM), info dataset UCI |
+| Parameter | Nilai |
+|-----------|-------|
+| framework | TensorFlow 2.13.1 / Keras 2.13.1 |
+| arsitektur | `LSTM(64) -> Dropout(0.2) -> LSTM(32) -> Dense(16, relu) -> Dense(1)` |
+| input | 1 fitur (`Global_active_power`), window 24 jam |
+| normalisasi | `StandardScaler` (mean=1.086397, std=0.929282) |
+| optimizer | Adam (lr=0.001) |
+| loss | MSE |
+| epochs | 50, Early Stopping patience=10 |
+| batch_size | 64 |
+| Ukuran model | ~400 KB (.keras) |
 
 ---
 
@@ -259,60 +275,88 @@ Proyek skripsi yang membandingkan tiga algoritma Machine Learning/Deep Learning 
 ```
 smart-home-energy-prediction/
 |
-|-- index.html                 # Single Page Application (3 halaman)
-|-- css/
-|   +-- style.css              # Dark theme + responsive design
-|-- js/
-|   +-- app.js                 # Logika aplikasi, Plotly charts, metrik
-|-- data/
-|   |-- sample_data.json       # 168 data points (7 hari terakhir test set)
-|   +-- full_test_data.json    # 5.121 data points (seluruh test set)
-|-- vercel.json                # Konfigurasi deployment Vercel
-|-- .gitignore
++-- index.html                           <- SPA (3 halaman)
++-- css/
+|   +-- style.css                        <- dark theme, responsive layout
++-- js/
+|   +-- app.js                           <- SPA logic: fetch, chart, metrics
+|
++-- data/
+|   +-- individual+household+            <- dataset UCI (zip, di-commit ke git)
+|   |   electric+power+consumption.zip
+|   +-- predictions.json                 <- prediksi model (di-commit, ~364 KB)
+|   +-- full_test_data.json              <- [GENERATED saat build] 5.121 titik
+|   +-- sample_data.json                 <- [GENERATED saat build] 168 titik
+|
++-- scripts/
+|   +-- build.js                         <- Vercel build: ekstrak + proses + generate
+|   +-- extract-predictions.js          <- utility lokal (sudah dijalankan sekali)
+|
++-- package.json                         <- dep: unzipper@0.12.3
++-- vercel.json                          <- buildCommand + Cache-Control headers
++-- .gitignore
 +-- README.md
 ```
 
-**Total ukuran deploy: ~661 KB**
+> File **[GENERATED]** tidak di-commit. Dibuat otomatis setiap Vercel build dari zip + predictions.json.
 
 ---
 
-## Deployment
+## Setup & Deployment
 
-### Vercel (Recommended)
+### 1. Tambahkan Dataset ke Repo
 
-```bash
-# Cara 1: CLI
-npm i -g vercel
-vercel
+Salin file zip dataset ke folder `data/`:
 
-# Cara 2: GitHub Integration
-# 1. Push ke GitHub
-# 2. Import di vercel.com
-# 3. Deploy otomatis
+```
+data/individual+household+electric+power+consumption.zip
 ```
 
-### Lokal
+Download dari UCI: https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption
+
+> Pastikan ukuran zip **< 100 MB** (batas GitHub). File .txt 125 MB setelah diekstrak tidak di-commit.
+
+### 2. Commit dan Push
 
 ```bash
+git add data/individual+household+electric+power+consumption.zip
+git add data/predictions.json scripts/ package.json vercel.json .gitignore README.md
+git commit -m "Add dataset zip and Vercel build pipeline"
+git push
+```
+
+### 3. Deploy ke Vercel
+
+Vercel menjalankan otomatis:
+
+```
+npm install
+node scripts/build.js
+```
+
+Build script mengekstrak zip, memproses `household_power_consumption.txt` (2.07 juta baris), dan men-generate JSON data. Setelah selesai, Vercel men-deploy semua file statis.
+
+### 4. Jalankan Lokal
+
+```bash
+# Install dependensi build
+npm install
+
+# Butuh: data/individual+household+electric+power+consumption.zip
+npm run build
+
+# Serve static files
+npx serve . -p 3000
+# atau
 python -m http.server 8000
-# Buka http://localhost:8000
 ```
 
 ---
 
 ## Referensi
 
-1. D. Ageng et al., "A Short-Term Household Load Forecasting Framework Using LSTM and Data Preparation," *IEEE Access*, vol. 9, 2021
-2. A. S. Shah et al., "Dynamic user preference parameters selection and energy consumption optimization for smart homes," *IEEE Access*, vol. 8, 2020
-3. L. Xiang et al., "Prediction model of household appliance energy consumption based on machine learning," *J. Phys. Conf. Ser.*, 2020
-4. M. Xue et al., "Research on Load Forecasting of Charging Station Based on XGBoost and LSTM Model," *J. Phys. Conf. Ser.*, 2021
-5. S. V. Oprea and A. Bara, "Machine Learning Algorithms for Short-Term Load Forecast in Residential Buildings Using Smart Meters," *IEEE Access*, vol. 7, 2019
-6. [UCI Dataset - Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
-
----
-
-<p align="center">
-  <strong>Skripsi</strong> - Program Studi Teknik Informatika<br>
-  <strong>Franscen Yosafat Sinambela</strong> (NIM. 2244053)<br>
-  STMIK TIME Medan - 2025
-</p>
+1. Breiman, L. (2001). Random forests. *Machine Learning*, 45(1), 5–32.
+2. Friedman, J. H. (2001). Greedy function approximation: A gradient boosting machine. *Annals of Statistics*, 29(5), 1189–1232.
+3. Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. *Neural Computation*, 9(8), 1735–1780.
+4. Géron, A. (2019). *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow* (2nd ed.). O'Reilly Media.
+5. UCI Machine Learning Repository. (2012). *Individual Household Electric Power Consumption Data Set*. https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption

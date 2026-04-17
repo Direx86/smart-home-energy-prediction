@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Home Energy Prediction</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
@@ -13,7 +13,9 @@
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <span class="brand-icon">⚡</span>
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
         <div>
             <h2>Smart Home Energy</h2>
             <p>Prediksi Konsumsi Energi Rumah Tangga</p>
@@ -21,14 +23,14 @@
     </div>
     <hr class="divider">
     <nav class="nav-menu">
-        <a href="#" class="nav-link active" data-page="dashboard"><span>🏠</span> Dashboard</a>
-        <a href="#" class="nav-link" data-page="prediksi"><span>📊</span> Prediksi &amp; Perbandingan</a>
-        <a href="#" class="nav-link" data-page="model"><span>🧠</span> Informasi Model</a>
+        <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+        <a href="#" class="nav-link" data-page="prediksi">Prediksi &amp; Perbandingan</a>
+        <a href="#" class="nav-link" data-page="model">Informasi Model</a>
     </nav>
     <div class="sidebar-footer">
         <hr class="divider">
         <p class="footer-label">Dataset</p>
-        <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener" class="footer-link">📂 UCI Power Consumption</a>
+        <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener" class="footer-link">UCI Power Consumption</a>
         <p class="footer-text">Desember 2006 – November 2010</p>
         <hr class="divider">
         <p class="footer-text">Skripsi — Franscen Yosafat Sinambela · 2025</p>
@@ -38,8 +40,14 @@
 
 <!-- Mobile Header -->
 <header class="mobile-header" id="mobile-header">
-    <button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button>
-    <h2>⚡ Smart Home Energy</h2>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
+    <h2>Smart Home Energy</h2>
 </header>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
@@ -49,28 +57,28 @@
 <!-- ═══════════════════════════════════════ DASHBOARD ═══════════════════════════════════════ -->
 <section id="page-dashboard" class="page active">
     <div class="page-header">
-        <h1>🏠 Dashboard Smart Home</h1>
+        <h1>Dashboard</h1>
         <p class="subtitle">Monitoring &amp; Prediksi Konsumsi Energi Rumah Tangga</p>
     </div>
 
     <div class="stat-grid" id="stat-cards">
         <div class="stat-card">
-            <p class="stat-label">⚡ Konsumsi Terakhir</p>
+            <p class="stat-label">Konsumsi Terakhir</p>
             <p class="stat-value" id="stat-latest">—</p>
             <p class="stat-help">Global Active Power (terbaru)</p>
         </div>
         <div class="stat-card">
-            <p class="stat-label">📈 Rata-rata 7 Hari</p>
+            <p class="stat-label">Rata-rata 7 Hari</p>
             <p class="stat-value" id="stat-avg">—</p>
             <p class="stat-help" id="stat-avg-help">—</p>
         </div>
         <div class="stat-card">
-            <p class="stat-label">🔺 Konsumsi Tertinggi</p>
+            <p class="stat-label">Konsumsi Tertinggi</p>
             <p class="stat-value" id="stat-max">—</p>
             <p class="stat-help">Puncak pemakaian 7 hari</p>
         </div>
         <div class="stat-card">
-            <p class="stat-label">🔻 Konsumsi Terendah</p>
+            <p class="stat-label">Konsumsi Terendah</p>
             <p class="stat-value" id="stat-min">—</p>
             <p class="stat-help">Minimum pemakaian 7 hari</p>
         </div>
@@ -78,52 +86,52 @@
 
     <hr class="section-divider">
 
-    <h2>📋 Variabel Dataset UCI</h2>
+    <h2>Variabel Dataset UCI</h2>
     <p class="section-caption">Sumber: <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Machine Learning Repository</a> — Individual Household Electric Power Consumption</p>
 
     <div class="var-grid">
         <div class="var-card">
-            <p class="var-name">⚡ Global Active Power</p>
+            <p class="var-name">Global Active Power</p>
             <div class="var-badge" style="border-left-color:#3b82f6">Global_active_power <span class="unit">(kW)</span></div>
             <p class="var-desc">Total daya aktif rumah tangga — <strong>TARGET prediksi</strong></p>
         </div>
         <div class="var-card">
-            <p class="var-name">🔄 Global Reactive Power</p>
+            <p class="var-name">Global Reactive Power</p>
             <div class="var-badge" style="border-left-color:#8b5cf6">Global_reactive_power <span class="unit">(kW)</span></div>
             <p class="var-desc">Total daya reaktif rumah tangga</p>
         </div>
         <div class="var-card">
-            <p class="var-name">⚡ Voltage</p>
+            <p class="var-name">Voltage</p>
             <div class="var-badge" style="border-left-color:#eab308">Voltage <span class="unit">(Volt)</span></div>
             <p class="var-desc">Tegangan listrik rata-rata per menit</p>
         </div>
         <div class="var-card">
-            <p class="var-name">🔌 Global Intensity</p>
+            <p class="var-name">Global Intensity</p>
             <div class="var-badge" style="border-left-color:#f97316">Global_intensity <span class="unit">(Ampere)</span></div>
             <p class="var-desc">Arus listrik rata-rata per menit</p>
         </div>
         <div class="var-card">
-            <p class="var-name">🍳 Sub Metering 1</p>
+            <p class="var-name">Sub Metering 1</p>
             <div class="var-badge" style="border-left-color:#10b981">Sub_metering_1 <span class="unit">(Wh)</span></div>
             <p class="var-desc">Dapur: dishwasher, oven, microwave</p>
         </div>
         <div class="var-card">
-            <p class="var-name">👕 Sub Metering 2</p>
+            <p class="var-name">Sub Metering 2</p>
             <div class="var-badge" style="border-left-color:#06b6d4">Sub_metering_2 <span class="unit">(Wh)</span></div>
             <p class="var-desc">Laundry: mesin cuci, pengering, kulkas</p>
         </div>
         <div class="var-card">
-            <p class="var-name">🌡️ Sub Metering 3</p>
+            <p class="var-name">Sub Metering 3</p>
             <div class="var-badge" style="border-left-color:#ef4444">Sub_metering_3 <span class="unit">(Wh)</span></div>
             <p class="var-desc">Pemanas air listrik &amp; AC</p>
         </div>
     </div>
 
-    <div class="info-box">📊 <strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="dashboard-points">—</strong> points</div>
+    <div class="info-box"><strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="dashboard-points">—</strong> points</div>
 
     <hr class="section-divider">
 
-    <h2>📉 Grafik Perbandingan Prediksi 3 Model</h2>
+    <h2>Grafik Perbandingan Prediksi 3 Model</h2>
     <div id="dashboard-chart" class="chart-container"></div>
 
     <hr class="section-divider">
@@ -133,15 +141,15 @@
 <!-- ═══════════════════════════════════════ PREDIKSI ═══════════════════════════════════════ -->
 <section id="page-prediksi" class="page">
     <div class="page-header">
-        <h1>📊 Prediksi &amp; Perbandingan</h1>
+        <h1>Prediksi &amp; Perbandingan</h1>
         <p class="subtitle">Bandingkan hasil prediksi RF, GB, dan LSTM pada <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">dataset UCI asli</a></p>
     </div>
 
-    <div class="info-box">📊 <strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="prediksi-points">—</strong> points</div>
+    <div class="info-box"><strong>Data Asli:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Household Power Consumption</a> — Test Set: <strong id="prediksi-points">—</strong> points</div>
 
     <hr class="section-divider">
 
-    <h2>⚙️ Kontrol Visualisasi</h2>
+    <h2>Kontrol Visualisasi</h2>
     <div class="controls-grid">
         <div class="control-card">
             <p class="control-label">Rentang Waktu</p>
@@ -167,7 +175,7 @@
     <div id="prediksi-chart" class="chart-container"></div>
 
     <details class="expander">
-        <summary>📊 Analisis Error — <span id="error-points">0</span> points</summary>
+        <summary>Analisis Error — <span id="error-points">0</span> points</summary>
         <div id="error-content" class="error-grid"></div>
     </details>
 
@@ -177,7 +185,7 @@
     <hr class="section-divider">
 
     <!-- Penjelasan Metrik -->
-    <h2>📖 Penjelasan Metrik Evaluasi</h2>
+    <h2>Penjelasan Metrik Evaluasi</h2>
     <div class="card">
         <h3>Apa itu MAE, RMSE, dan R²?</h3>
         <div class="tabs">
@@ -244,7 +252,7 @@
 
     <hr class="section-divider">
 
-    <h2>🔍 Interpretasi Hasil</h2>
+    <h2>Interpretasi Hasil</h2>
     <div id="interpretation-cards"></div>
 
     <hr class="section-divider">
@@ -256,17 +264,17 @@
 <!-- ═══════════════════════════════════════ INFORMASI MODEL ═══════════════════════════════════════ -->
 <section id="page-model" class="page">
     <div class="page-header">
-        <h1>🧠 Informasi Model</h1>
+        <h1>Informasi Model</h1>
         <p class="subtitle">Detail arsitektur, parameter, dan karakteristik masing-masing model prediksi</p>
     </div>
 
     <!-- Random Forest -->
     <details class="expander" open>
-        <summary>🌲 Random Forest — Ensemble (Bagging)</summary>
+        <summary>Random Forest — Ensemble (Bagging)</summary>
         <div class="expander-body">
             <p>Ensemble dari banyak Decision Tree yang dilatih secara <strong>paralel</strong> dengan teknik bagging. Setiap tree dilatih pada subset data acak, lalu hasil prediksi dirata-ratakan. Robust terhadap overfitting dan mampu menangkap hubungan non-linear.</p>
             <hr class="divider">
-            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <h4>Parameter &amp; Konfigurasi</h4>
             <table class="simple-table">
                 <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
                 <tbody>
@@ -278,7 +286,7 @@
             </table>
             <div class="pros-cons">
                 <div>
-                    <h4>✅ Kelebihan</h4>
+                    <h4>Kelebihan</h4>
                     <ul>
                         <li>Robust terhadap overfitting</li>
                         <li>Tidak perlu scaling data</li>
@@ -287,7 +295,7 @@
                     </ul>
                 </div>
                 <div>
-                    <h4>❌ Kekurangan</h4>
+                    <h4>Kekurangan</h4>
                     <ul>
                         <li>Model berukuran besar (~48 MB)</li>
                         <li>Tidak menangkap pola sekuensial secara native</li>
@@ -300,11 +308,11 @@
 
     <!-- Gradient Boosting -->
     <details class="expander">
-        <summary>📈 Gradient Boosting — Ensemble (Boosting)</summary>
+        <summary>Gradient Boosting — Ensemble (Boosting)</summary>
         <div class="expander-body">
             <p>Ensemble dari Decision Tree yang dilatih secara <strong>sekuensial</strong>. Setiap tree baru belajar dari kesalahan (residual) tree sebelumnya, sehingga model terus membaik. Dikenal sebagai salah satu metode terbaik untuk data tabular.</p>
             <hr class="divider">
-            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <h4>Parameter &amp; Konfigurasi</h4>
             <table class="simple-table">
                 <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
                 <tbody>
@@ -316,7 +324,7 @@
             </table>
             <div class="pros-cons">
                 <div>
-                    <h4>✅ Kelebihan</h4>
+                    <h4>Kelebihan</h4>
                     <ul>
                         <li>Performa terbaik (R² = 0.9989)</li>
                         <li>Model ringan (~330 KB)</li>
@@ -325,7 +333,7 @@
                     </ul>
                 </div>
                 <div>
-                    <h4>❌ Kekurangan</h4>
+                    <h4>Kekurangan</h4>
                     <ul>
                         <li>Training lebih lambat dari Random Forest</li>
                         <li>Sensitif terhadap hyperparameter</li>
@@ -338,11 +346,11 @@
 
     <!-- LSTM -->
     <details class="expander">
-        <summary>🧠 LSTM — Deep Learning (RNN)</summary>
+        <summary>LSTM — Deep Learning (RNN)</summary>
         <div class="expander-body">
             <p>Long Short-Term Memory — arsitektur Recurrent Neural Network yang mampu mempelajari <strong>dependensi jangka panjang</strong> dalam data sekuensial. Menggunakan mekanisme gate (forget, input, output) untuk mengontrol aliran informasi.</p>
             <hr class="divider">
-            <h4>⚙️ Parameter &amp; Konfigurasi</h4>
+            <h4>Parameter &amp; Konfigurasi</h4>
             <table class="simple-table">
                 <thead><tr><th>Parameter</th><th>Nilai</th></tr></thead>
                 <tbody>
@@ -356,7 +364,7 @@
             </table>
             <div class="pros-cons">
                 <div>
-                    <h4>✅ Kelebihan</h4>
+                    <h4>Kelebihan</h4>
                     <ul>
                         <li>Dapat mempelajari pola temporal secara otomatis</li>
                         <li>Tidak perlu feature engineering manual</li>
@@ -365,7 +373,7 @@
                     </ul>
                 </div>
                 <div>
-                    <h4>❌ Kekurangan</h4>
+                    <h4>Kekurangan</h4>
                     <ul>
                         <li>Performa lebih rendah (R² = 0.52) hanya dengan 1 fitur</li>
                         <li>Butuh GPU untuk training cepat</li>
@@ -379,7 +387,7 @@
 
     <hr class="section-divider">
 
-    <h2>🛠️ Rekayasa Fitur (Feature Engineering)</h2>
+    <h2>Rekayasa Fitur (Feature Engineering)</h2>
     <p><strong>Fitur untuk Random Forest &amp; Gradient Boosting (24 fitur total):</strong></p>
     <div class="feature-grid">
         <div class="card">
@@ -440,7 +448,7 @@
 
     <hr class="section-divider">
 
-    <h2>📂 Tentang Dataset</h2>
+    <h2>Tentang Dataset</h2>
     <p><strong>Sumber:</strong> <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">UCI Machine Learning Repository — Individual Household Electric Power Consumption</a></p>
     <table class="simple-table" style="margin-top:12px">
         <thead><tr><th>Detail</th><th>Keterangan</th></tr></thead>
@@ -453,7 +461,7 @@
             <tr><td>Metode Split</td><td>Time-based split (kronologis, tanpa shuffling)</td></tr>
         </tbody>
     </table>
-    <p style="margin-top:16px">📎 <a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">Unduh dataset dari UCI Repository</a></p>
+    <p style="margin-top:16px"><a href="https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption" target="_blank" rel="noopener">Unduh dataset dari UCI Repository</a></p>
 </section>
 
 </main>

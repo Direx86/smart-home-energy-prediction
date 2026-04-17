@@ -57,8 +57,8 @@ function renderDashboard() {
     if (sampleData.metrics) {
         document.getElementById('dashboard-metrics').innerHTML = renderMetricsHTML(
             sampleData.metrics,
-            '🏆 Perbandingan Metrik Evaluasi (Test Set)',
-            'Semakin kecil MAE & RMSE = semakin baik. Semakin besar R² (mendekati 1) = semakin baik. ⭐ = terbaik.'
+            'Perbandingan Metrik Evaluasi (Test Set)',
+            'Semakin kecil MAE & RMSE = semakin baik. Semakin besar R² (mendekati 1) = semakin baik.'
         );
     }
 }
@@ -90,21 +90,21 @@ function updatePrediksi() {
     var labels = { 0: 'Full Test Set', 24: '24 Jam', 48: '48 Jam', 168: '7 Hari', 720: '30 Hari' };
     var timeLabel = labels[timeRange] || timeRange + ' Jam';
 
-    createChart(data, 'prediksi-chart', 'Grafik Perbandingan — ' + timeLabel + ' (' + data.length + ' points)', showModels, 500);
+    createChart(data, 'prediksi-chart', 'Perbandingan Prediksi — ' + timeLabel + ' (' + data.length + ' points)', showModels, 500);
     renderErrorAnalysis(data);
 
     var dynamicMetrics = computeMetrics(data);
     document.getElementById('dynamic-metrics').innerHTML = renderMetricsHTML(
         dynamicMetrics,
-        '📈 Metrik Evaluasi — ' + timeLabel + ' (' + data.length + ' points)',
-        'Dihitung ulang secara dinamis berdasarkan rentang waktu yang dipilih. ⭐ = terbaik.'
+        'Metrik Evaluasi — ' + timeLabel + ' (' + data.length + ' points)',
+        'Dihitung ulang secara dinamis berdasarkan rentang waktu yang dipilih.'
     );
 
     if (sampleData && sampleData.metrics) {
         document.getElementById('official-metrics').innerHTML = renderMetricsHTML(
             sampleData.metrics,
-            '🏆 Metrik Evaluasi Resmi — Full Test Set (5.121 points)',
-            'Metrik tetap dari evaluasi seluruh test set (15% data). Ini adalah angka yang dilaporkan di skripsi. ⭐ = terbaik.'
+            'Metrik Evaluasi Resmi — Full Test Set (5.121 points)',
+            'Metrik tetap dari evaluasi seluruh test set (15% data). Ini adalah angka yang dilaporkan di skripsi.'
         );
     }
 
@@ -193,9 +193,9 @@ function renderMetricsHTML(metrics, title, subtitle) {
         var m = metrics[i];
         rows += '<tr>';
         rows += '<td>' + m.model + '</td>';
-        rows += '<td' + (i === bestMAE ? ' class="best"' : '') + '>' + m.MAE.toFixed(4) + (i === bestMAE ? ' ⭐' : '') + '</td>';
-        rows += '<td' + (i === bestRMSE ? ' class="best"' : '') + '>' + m.RMSE.toFixed(4) + (i === bestRMSE ? ' ⭐' : '') + '</td>';
-        rows += '<td' + (i === bestR2 ? ' class="best"' : '') + '>' + m.R2.toFixed(4) + (i === bestR2 ? ' ⭐' : '') + '</td>';
+        rows += '<td' + (i === bestMAE ? ' class="best"' : '') + '>' + m.MAE.toFixed(4) + '</td>';
+        rows += '<td' + (i === bestRMSE ? ' class="best"' : '') + '>' + m.RMSE.toFixed(4) + '</td>';
+        rows += '<td' + (i === bestR2 ? ' class="best"' : '') + '>' + m.R2.toFixed(4) + '</td>';
         rows += '</tr>';
     }
     return '<h3>' + title + '</h3>' +
@@ -248,20 +248,20 @@ function renderInterpretation() {
     var lstm = findMetric(metrics, 'LSTM', { MAE: 0.3462, RMSE: 0.4896, R2: 0.5243 });
 
     document.getElementById('interpretation-cards').innerHTML =
-        interpCard('🌲 Random Forest (RF)', rf, '', [
+        interpCard('Random Forest (RF)', rf, '', [
             '<strong>MAE sangat kecil</strong> (~' + rf.MAE.toFixed(3) + ' kW) — prediksi hampir selalu sangat dekat dengan nilai aktual.',
             '<strong>RMSE ≈ MAE</strong> — tidak ada kesalahan ekstrem, prediksi sangat konsisten.',
             '<strong>R² = ' + rf.R2.toFixed(4) + '</strong> — model menjelaskan <strong>' + (rf.R2 * 100).toFixed(2) + '%</strong> variasi konsumsi energi.',
             'Keunggulan berkat <strong>24 fitur</strong> (sensor + kalender + lag + rolling statistics).'
         ]) +
-        interpCard('📈 Gradient Boosting (GB) — 🥇 Model Terbaik', gb, 'border-left:3px solid #f97316', [
+        interpCard('Gradient Boosting (GB) — Model Terbaik', gb, 'border-left:3px solid #f97316', [
             '<strong>MAE terendah</strong> (' + gb.MAE.toFixed(4) + ' kW) — akurasi tertinggi di antara ketiga model.',
             '<strong>RMSE terendah</strong> (' + gb.RMSE.toFixed(4) + ' kW) — paling konsisten.',
             '<strong>R² tertinggi</strong> (' + gb.R2.toFixed(4) + ') — menjelaskan <strong>' + (gb.R2 * 100).toFixed(2) + '%</strong> variasi data.',
             'Strategi <em>sequential learning</em> (boosting): setiap tree baru mengoreksi kesalahan tree sebelumnya.',
             'Ukuran model hanya ~330 KB (vs RF ~48 MB) — <strong>lebih efisien untuk deployment</strong>.'
         ], true) +
-        interpCard('🧠 LSTM (Long Short-Term Memory)', lstm, '', [
+        interpCard('LSTM (Long Short-Term Memory)', lstm, '', [
             '<strong>MAE ~' + lstm.MAE.toFixed(2) + ' kW</strong> — sekitar <strong>' + Math.round(lstm.MAE / gb.MAE) + '× lebih besar</strong> dari Gradient Boosting.',
             '<strong>RMSE ≫ MAE</strong> — ada beberapa prediksi yang meleset cukup jauh.',
             '<strong>R² = ' + lstm.R2.toFixed(4) + '</strong> — hanya menjelaskan <strong>' + (lstm.R2 * 100).toFixed(2) + '%</strong> variasi data.',
@@ -304,7 +304,7 @@ function renderConclusion() {
     var gb = findMetric(metrics, 'GradientBoosting', { MAE: 0.0158, RMSE: 0.0239, R2: 0.9989 });
 
     document.getElementById('conclusion-section').innerHTML =
-        '<div class="card"><h3>🏆 Perbandingan RF vs GB: Mana yang Terbaik?</h3>' +
+        '<div class="card"><h3>Perbandingan RF vs GB: Mana yang Terbaik?</h3>' +
         '<table class="metrics-table"><thead><tr><th>Metrik</th><th>Random Forest</th><th>Gradient Boosting</th><th>Pemenang</th></tr></thead><tbody>' +
         '<tr><td>MAE (↓ lebih baik)</td><td>' + rf.MAE.toFixed(4) + '</td><td class="best">' + gb.MAE.toFixed(4) + ' ⭐</td><td>Gradient Boosting</td></tr>' +
         '<tr><td>RMSE (↓ lebih baik)</td><td>' + rf.RMSE.toFixed(4) + '</td><td class="best">' + gb.RMSE.toFixed(4) + ' ⭐</td><td>Gradient Boosting</td></tr>' +
