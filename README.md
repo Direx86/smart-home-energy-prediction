@@ -9,6 +9,32 @@ Proyek skripsi yang membandingkan tiga algoritma Machine Learning/Deep Learning 
 
 ---
 
+## Sumber Dataset Resmi
+
+**UCI Machine Learning Repository — Individual Household Electric Power Consumption**
+
+```
+https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption
+```
+
+Link langsung: <https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption>
+
+| Detail | Keterangan |
+|--------|------------|
+| Nama Dataset | Individual Household Electric Power Consumption |
+| Repository | UCI Machine Learning Repository (Dataset ID: 235) |
+| Periode | Desember 2006 – November 2010 (~4 tahun) |
+| Resolusi | Per 1 menit |
+| Total Records | 2.075.260 baris |
+| Ukuran File | ~125 MB (terkompresi ~20 MB dalam zip) |
+| Target | `Global_active_power` (kW) |
+| Lisensi | Creative Commons Attribution 4.0 International (CC BY 4.0) |
+| Kontributor | Georges Hébrail, Alice Bérard (2012) |
+
+> **Untuk Dosen Pembimbing / Penguji:** Dataset yang digunakan dalam skripsi ini adalah dataset **resmi dan publik** dari UCI Machine Learning Repository. Silakan klik link di atas untuk verifikasi dan mengunduh dataset asli. Dataset yang sama di-commit dalam format zip di folder `data/` repositori ini (lihat [`data/individual+household+electric+power+consumption.zip`](data/individual+household+electric+power+consumption.zip)).
+
+---
+
 ## Hasil Evaluasi Model
 
 | Ranking | Model | MAE (kW) | RMSE (kW) | R² |
