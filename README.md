@@ -161,10 +161,9 @@ household_power_consumption.txt (125 MB, 2.07 juta baris)
     - Rolling   (8): rollmean3/6/12/24, rollstd3/6/12/24
              |
              v
-    Train/Val/Test Split -- time-based (70% / 15% / 15%)
-    - Train : Des 2006 - Apr 2010  (23.902 jam)
-    - Val   : Apr 2010 - Ags 2010  ( 5.121 jam)
-    - Test  : Ags 2010 - Nov 2010  ( 5.121 jam)
+    Train/Test Split -- time-based (85% / 15%)
+    - Train : Des 2006 - Apr 2010  (29.047 jam)   <- validasi via CV internal
+    - Test  : Apr 2010 - Nov 2010  ( 5.121 jam)   <- ditampilkan di website
              |
     +--------+--------+
     |        |        |
@@ -206,17 +205,28 @@ Sumber: [archive.ics.uci.edu](https://archive.ics.uci.edu/dataset/235/individual
 **Pembagian data setelah resampling hourly:**
 
 ```
-2.075.259 baris (1 menit)
+2.075.260 baris (1 menit)
           |
-          v resample hourly mean
-      34.144 jam total
+          v  resample hourly mean
+     34.168 jam total
           |
-     +----+----+
-     |    |    |
-   70%   15%  15%
- Train   Val  Test
-23.902  5.121 5.121 jam
+    +-----+-----+
+    |           |
+   85%         15%
+  Train       Test
+ 29.047 jam  5.121 jam
+ (Des 2006  (Apr 2010
+  - Apr      - Nov
+  2010)      2010)
+    |
+    v
+Validasi dilakukan via
+Cross-Validation internal
+(RandomizedSearchCV, 5-fold)
+pada set training
 ```
+
+> **Catatan penting:** Website hanya menampilkan **5.121 titik test set (April – November 2010)** — bukan full dataset 4 tahun. Ini adalah praktik standar ML: evaluasi model dilakukan pada data yang **belum pernah dilihat saat training** agar tidak overfit. Data training (Des 2006 – April 2010) tidak divisualisasikan karena prediksi di atasnya akan terlihat "sempurna" dan tidak mencerminkan performa sesungguhnya.
 
 ---
 
